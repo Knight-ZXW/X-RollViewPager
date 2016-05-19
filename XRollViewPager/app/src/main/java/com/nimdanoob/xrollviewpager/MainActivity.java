@@ -21,8 +21,7 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         mRollViewPager= (RollPagerView) findViewById(R.id.roll_view_pager);
-        mRollViewPager.setPlayDelay(1000);
-        mRollViewPager.setAnimationDurtion(500);
+//        mRollViewPager.setAnimationDurtion(500);
         mRollViewPager.setAdapter(new TestLoopAdapter(mRollViewPager));
 //        mRollViewPager.setAdapter(new TestNomalAdapter());
         mRollViewPager.setHintView(new IconHintView(this,R.drawable.point_focus,R.drawable.point_normal));
@@ -106,5 +105,17 @@ public class MainActivity extends AppCompatActivity {
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        mRollViewPager.resume();
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        mRollViewPager.pause();
     }
 }

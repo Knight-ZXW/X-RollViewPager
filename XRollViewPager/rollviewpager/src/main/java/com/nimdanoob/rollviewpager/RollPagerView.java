@@ -11,6 +11,7 @@ import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v4.view.ViewPager.OnPageChangeListener;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
@@ -96,7 +97,6 @@ public class RollPagerView extends RelativeLayout implements OnPageChangeListene
 		if(mViewPager!=null){
 			removeView(mViewPager);
 		}
-
 		TypedArray type = getContext().obtainStyledAttributes(attrs, R.styleable.RollViewPager);
 		gravity = type.getInteger(R.styleable.RollViewPager_rollviewpager_hint_gravity, 1);
 		delay = type.getInt(R.styleable.RollViewPager_rollviewpager_play_delay, 0);
@@ -124,8 +124,9 @@ public class RollPagerView extends RelativeLayout implements OnPageChangeListene
 
         @Override
         public void handleMessage(Message msg) {
-            RollPagerView rollPagerView = mRollPagerViewWeakReference.get();
-            int cur = rollPagerView.getViewPager().getCurrentItem()+1;
+			RollPagerView rollPagerView = mRollPagerViewWeakReference.get();
+			rollPagerView.mRecentTouchTime = System.currentTimeMillis();
+			int cur = rollPagerView.getViewPager().getCurrentItem()+1;
             if(cur>=rollPagerView.mAdapter.getCount()){
                 cur=0;
             }
@@ -140,15 +141,23 @@ public class RollPagerView extends RelativeLayout implements OnPageChangeListene
 
         public WeakTimerTask(RollPagerView mRollPagerView) {
             this.mRollPagerViewWeakReference = new WeakReference<>(mRollPagerView);
-        }
+			Log.w("rollPager","delay =" +mRollPagerViewWeakReference.get().delay);
+
+		}
 
         @Override
         public void run() {
             RollPagerView rollPagerView = mRollPagerViewWeakReference.get();
             if (rollPagerView!=null){
-                if(rollPagerView.isShown() && System.currentTimeMillis()-rollPagerView.mRecentTouchTime>rollPagerView.delay){
+				long duration = System.currentTimeMillis() - rollPagerView.mRecentTouchTime;
+				if(rollPagerView.isShown() && duration+5 >=rollPagerView.delay){
                     rollPagerView.mHandler.sendEmptyMessage(0);
-                }
+					Log.w("rollPager","second tiem ="+ duration +",send empty Message" );
+				}
+				if (duration<1500){
+					Log.w("rollPager","bug" );
+
+				}
             }else{
                 cancel();
             }
