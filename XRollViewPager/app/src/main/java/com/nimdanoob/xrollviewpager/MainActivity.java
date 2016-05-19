@@ -1,5 +1,6 @@
 package com.nimdanoob.xrollviewpager;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
@@ -21,13 +22,11 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         mRollViewPager= (RollPagerView) findViewById(R.id.roll_view_pager);
-//        mRollViewPager.setAnimationDurtion(500);
         mRollViewPager.setAdapter(new TestLoopAdapter(mRollViewPager));
 //        mRollViewPager.setAdapter(new TestNomalAdapter());
         mRollViewPager.setHintView(new IconHintView(this,R.drawable.point_focus,R.drawable.point_normal));
         //mRollViewPager.setHintView(new ColorPointHintView(this, Color.YELLOW,Color.WHITE));
         //mRollViewPager.setHintView(new TextHintView(this));
-        //mRollViewPager.setHintView(null);
 
     }
 
@@ -101,6 +100,8 @@ public class MainActivity extends AppCompatActivity {
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
+            Intent intent = new Intent(getBaseContext(),Main2Activity.class);
+            startActivity(intent);
             return true;
         }
 
@@ -117,5 +118,16 @@ public class MainActivity extends AppCompatActivity {
     protected void onPause() {
         super.onPause();
         mRollViewPager.pause();
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        mRollViewPager.stop();
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
     }
 }

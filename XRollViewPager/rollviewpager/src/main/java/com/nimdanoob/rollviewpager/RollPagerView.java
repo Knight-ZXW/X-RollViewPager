@@ -5,13 +5,10 @@ import android.content.res.TypedArray;
 import android.database.DataSetObserver;
 import android.graphics.Color;
 import android.graphics.drawable.GradientDrawable;
-import android.os.Handler;
-import android.os.Message;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v4.view.ViewPager.OnPageChangeListener;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
@@ -19,17 +16,15 @@ import android.view.animation.Interpolator;
 import android.widget.RelativeLayout;
 import android.widget.Scroller;
 
+import com.nimdanoob.rollviewpager.control.HandlerControl;
 import com.nimdanoob.rollviewpager.hintview.ColorPointHintView;
 
-import java.lang.ref.WeakReference;
 import java.lang.reflect.Field;
-import java.util.Timer;
-import java.util.TimerTask;
 
 /**
  * 支持轮播和提示的的viewpager
  */
-public class RollPagerView extends RelativeLayout implements OnPageChangeListener {
+public class RollPagerView extends RelativeLayout implements OnPageChangeListener, TimerListener {
 
 	private ViewPager mViewPager;
 	private PagerAdapter mAdapter;
@@ -52,7 +47,12 @@ public class RollPagerView extends RelativeLayout implements OnPageChangeListene
 	private int paddingBottom;
 
 	private View mHintView;
-	private Timer timer;
+
+	private TimerControl mRollerControl;
+
+
+
+//	private Timer timer;
 
 	public interface HintViewDelegate{
         void setCurrentPosition(int position, HintView hintView);
@@ -114,79 +114,6 @@ public class RollPagerView extends RelativeLayout implements OnPageChangeListene
 		type.recycle();
 		initHint(new ColorPointHintView(getContext(),Color.parseColor("#E3AC42"),Color.parseColor("#88ffffff")));
 	}
-
-    private final static class TimeTaskHandler extends Handler{
-        private WeakReference<RollPagerView> mRollPagerViewWeakReference;
-
-        public TimeTaskHandler(RollPagerView rollPagerView) {
-            this.mRollPagerViewWeakReference = new WeakReference<>(rollPagerView);
-        }
-
-        @Override
-        public void handleMessage(Message msg) {
-			RollPagerView rollPagerView = mRollPagerViewWeakReference.get();
-			rollPagerView.mRecentTouchTime = System.currentTimeMillis();
-			int cur = rollPagerView.getViewPager().getCurrentItem()+1;
-            if(cur>=rollPagerView.mAdapter.getCount()){
-                cur=0;
-            }
-            rollPagerView.getViewPager().setCurrentItem(cur);
-            rollPagerView.mHintViewDelegate.setCurrentPosition(cur, (HintView) rollPagerView.mHintView);
-        }
-    }
-    private TimeTaskHandler mHandler = new TimeTaskHandler(this);
-
-    private static class WeakTimerTask extends TimerTask{
-        private WeakReference<RollPagerView> mRollPagerViewWeakReference;
-
-        public WeakTimerTask(RollPagerView mRollPagerView) {
-            this.mRollPagerViewWeakReference = new WeakReference<>(mRollPagerView);
-			Log.w("rollPager","delay =" +mRollPagerViewWeakReference.get().delay);
-
-		}
-
-        @Override
-        public void run() {
-            RollPagerView rollPagerView = mRollPagerViewWeakReference.get();
-            if (rollPagerView!=null){
-				long duration = System.currentTimeMillis() - rollPagerView.mRecentTouchTime;
-				if(rollPagerView.isShown() && duration+5 >=rollPagerView.delay){
-                    rollPagerView.mHandler.sendEmptyMessage(0);
-					Log.w("rollPager","second tiem ="+ duration +",send empty Message" );
-				}
-				if (duration<1500){
-					Log.w("rollPager","bug" );
-
-				}
-            }else{
-                cancel();
-            }
-        }
-    }
-
-	/**
-	 * 开始播放
-	 * 仅当view正在显示 且 触摸等待时间过后 播放
-	 */
-	private void startPlay(){
-		if(delay<=0||mAdapter==null||mAdapter.getCount()<=1){
-			return;
-		}
-		if (timer!=null){
-			timer.cancel();
-		}
-		timer = new Timer();
-		//用一个timer定时设置当前项为下一项
-		timer.schedule(new WeakTimerTask(this), delay, delay);
-	}
-
-    private void stopPlay(){
-        if (timer!=null){
-            timer.cancel();
-            timer = null;
-        }
-    }
-
 
     public void setHintViewDelegate(HintViewDelegate delegate){
         this.mHintViewDelegate = delegate;
@@ -273,21 +200,48 @@ public class RollPagerView extends RelativeLayout implements OnPageChangeListene
 
     public void setPlayDelay(int delay){
         this.delay = delay;
-        startPlay();
+
     }
 
 
+	@Override
+	public void showNext() {
+		int next = mViewPager.getCurrentItem() + 1;
+		mViewPager.setCurrentItem(next,true);
+	}
+
+	@Override
+	public void onStart() {
+		int next = mViewPager.getCurrentItem() + 1;
+		mViewPager.setCurrentItem(next,true);
+	}
+
+	@Override
+	public void onPause() {
+//		int next = mViewPager.getCurrentItem() + 1;
+//		mViewPager.setCurrentItem(next,true);
+	}
+
+	@Override
+	public void onStop() {
+
+	}
+
+	public void start(){
+		mRollerControl.start();
+	}
     public void pause(){
-        stopPlay();
+		mRollerControl.pause();
     }
 
     public void resume(){
-        startPlay();
+		mRollerControl.start();
     }
+	public void stop(){
+		mRollerControl.stop();
+	}
 
-    public boolean isPlaying(){
-        return timer!=null;
-    }
+
 
 	/**
 	 * 设置提示view的位置
@@ -343,9 +297,12 @@ public class RollPagerView extends RelativeLayout implements OnPageChangeListene
 		mViewPager.setAdapter(adapter);
 		mViewPager.addOnPageChangeListener(this);
 		mAdapter = adapter;
+		mRollerControl = new HandlerControl();
+		mRollerControl.setInterval(delay);
+		mRollerControl.setListener(this);
 		dataSetChanged();
 		adapter.registerDataSetObserver(new JPagerObserver());
-
+//		mRollerControl.start();
 	}
 
 	/**
@@ -364,7 +321,6 @@ public class RollPagerView extends RelativeLayout implements OnPageChangeListene
 	}
 
 	private void dataSetChanged(){
-		startPlay();
 		if(mHintView!=null)
 			mHintViewDelegate.initView(mAdapter.getCount(), gravity, (HintView) mHintView);
 	}
