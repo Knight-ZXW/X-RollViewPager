@@ -1,1 +1,1 @@
-Android 轮播控件
+Android ViewPager 实现的 轮播控件
