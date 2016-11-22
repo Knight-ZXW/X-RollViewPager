@@ -23,7 +23,6 @@ public class MainActivity extends AppCompatActivity {
         mRollViewPager.setHintView(new IconHintView(this,R.drawable.point_focus,R.drawable.point_normal));
         //mRollViewPager.setHintView(new ColorPointHintView(this, Color.YELLOW,Color.WHITE));
         //mRollViewPager.setHintView(new TextHintView(this));
-
     }
 
     private class TestLoopAdapter extends LoopPagerAdapter {

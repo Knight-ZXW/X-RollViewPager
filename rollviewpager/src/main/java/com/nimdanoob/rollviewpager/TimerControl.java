@@ -9,7 +9,6 @@ public interface TimerControl {
      void resume();
      void pause();
      void stop();
-
     void setInterval(int delay);
 
     void setListener(TimerListener timerListener);

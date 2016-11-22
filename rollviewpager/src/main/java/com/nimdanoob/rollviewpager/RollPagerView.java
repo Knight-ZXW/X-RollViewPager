@@ -48,6 +48,9 @@ public class RollPagerView extends RelativeLayout implements OnPageChangeListene
 
   private TimerControl mRollerControl;
 
+  //默认自动滚动
+  private boolean autoScroll = true;
+
   //	private Timer timer;
   private HintViewDelegate mHintViewDelegate = new HintViewDelegate() {
     @Override
@@ -196,8 +199,11 @@ public class RollPagerView extends RelativeLayout implements OnPageChangeListene
 
   @Override
   public void showNext() {
-    int next = mViewPager.getCurrentItem() + 1;
-    mViewPager.setCurrentItem(next, true);
+    //实现用户点击时 不自动滑动
+    if (autoScroll ) {
+      int next = mViewPager.getCurrentItem() + 1;
+      mViewPager.setCurrentItem(next, true);
+    }
   }
 
   @Override
@@ -300,7 +306,14 @@ public class RollPagerView extends RelativeLayout implements OnPageChangeListene
    */
   @Override
   public boolean dispatchTouchEvent(MotionEvent ev) {
-    mRecentTouchTime = System.currentTimeMillis();
+    switch (ev.getAction()) {
+      case MotionEvent.ACTION_DOWN:
+        autoScroll = false;
+        break;
+      case MotionEvent.ACTION_UP:
+        mRecentTouchTime = System.currentTimeMillis();
+        autoScroll = true;
+    }
     return super.dispatchTouchEvent(ev);
   }
 
