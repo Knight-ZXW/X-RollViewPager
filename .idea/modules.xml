@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/XRollViewPager.iml" filepath="$PROJECT_DIR$/XRollViewPager.iml" />
+      <module fileurl="file://$PROJECT_DIR$/X-RollViewPager.iml" filepath="$PROJECT_DIR$/X-RollViewPager.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
       <module fileurl="file://$PROJECT_DIR$/rollviewpager/rollviewpager.iml" filepath="$PROJECT_DIR$/rollviewpager/rollviewpager.iml" />
     </modules>

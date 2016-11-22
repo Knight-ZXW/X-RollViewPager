@@ -1,14 +1,10 @@
 package com.nimdanoob.xrollviewpager;
 
-import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
-
 import com.nimdanoob.rollviewpager.RollPagerView;
 import com.nimdanoob.rollviewpager.adapter.LoopPagerAdapter;
 import com.nimdanoob.rollviewpager.adapter.StaticPagerAdapter;
@@ -23,7 +19,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         mRollViewPager= (RollPagerView) findViewById(R.id.roll_view_pager);
         mRollViewPager.setAdapter(new TestLoopAdapter(mRollViewPager));
-//        mRollViewPager.setAdapter(new TestNomalAdapter());
+//        mRollViewPager.setAdapter(new TestNormalAdapter());
         mRollViewPager.setHintView(new IconHintView(this,R.drawable.point_focus,R.drawable.point_normal));
         //mRollViewPager.setHintView(new ColorPointHintView(this, Color.YELLOW,Color.WHITE));
         //mRollViewPager.setHintView(new TextHintView(this));
@@ -59,7 +55,7 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-    private class TestNomalAdapter extends StaticPagerAdapter {
+    private class TestNormalAdapter extends StaticPagerAdapter {
         private int[] imgs = {
                 R.drawable.img1,
                 R.drawable.img2,
@@ -82,30 +78,6 @@ public class MainActivity extends AppCompatActivity {
         public int getCount() {
             return imgs.length;
         }
-    }
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_main, menu);
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
-
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            Intent intent = new Intent(getBaseContext(),Main2Activity.class);
-            startActivity(intent);
-            return true;
-        }
-
-        return super.onOptionsItemSelected(item);
     }
 
     @Override
